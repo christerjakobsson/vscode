@@ -148,7 +148,7 @@ export class CommandCenter {
 
 	@command('git.refresh')
 	async refresh(): Promise<void> {
-		await this.model.status();
+		await this.model.status(true);
 	}
 
 	@command('git.openResource')

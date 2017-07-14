@@ -249,10 +249,23 @@ function isReadOnly(operation: Operation): boolean {
 	}
 }
 
-function shouldShowProgress(operation: Operation): boolean {
+function shouldShowProgress(operation: Operation, isExplicitOperation: boolean = false): boolean {
 	switch (operation) {
 		case Operation.Fetch:
 			return false;
+		case Operation.Status:
+			const config = workspace.getConfiguration('git');
+			const showProgress = config.get<string>('showProgress');
+
+			if (showProgress === 'never') {
+				return false;
+			}
+
+			if (showProgress === 'explicit' && !isExplicitOperation) {
+				return false;
+			}
+
+			return true;
 		default:
 			return true;
 	}
@@ -394,8 +407,8 @@ export class Model implements Disposable {
 	}
 
 	@throttle
-	async status(): Promise<void> {
-		await this.run(Operation.Status);
+	async status(isExplicit: boolean = false): Promise<void> {
+		await this.run(Operation.Status, () => Promise.resolve(), isExplicit);
 	}
 
 	async add(...resources: Resource[]): Promise<void> {
@@ -558,7 +571,7 @@ export class Model implements Disposable {
 		});
 	}
 
-	private async run<T>(operation: Operation, runOperation: () => Promise<T> = () => Promise.resolve<any>(null)): Promise<T> {
+	private async run<T>(operation: Operation, runOperation: () => Promise<T> = () => Promise.resolve<any>(null), isExplicitOperation: boolean = false): Promise<T> {
 		const run = async () => {
 			this._operations = this._operations.start(operation);
 			this._onRunOperation.fire(operation);
@@ -591,7 +604,7 @@ export class Model implements Disposable {
 			}
 		};
 
-		return shouldShowProgress(operation)
+		return shouldShowProgress(operation, isExplicitOperation)
 			? window.withProgress({ location: ProgressLocation.SourceControl }, run)
 			: run();
 	}

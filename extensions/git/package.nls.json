@@ -44,5 +44,6 @@
 	"config.ignoreLegacyWarning": "Ignores the legacy Git warning",
 	"config.ignoreLimitWarning": "Ignores the warning when there are too many changes in a repository",
 	"config.defaultCloneDirectory": "The default location where to clone a git repository",
-	"config.enableSmartCommit": "Commit all changes when there are no staged changes."
+	"config.enableSmartCommit": "Commit all changes when there are no staged changes.",
+	"config.showProgress": "Whether to show progress, possibilities are 'always' (default), 'explicit', and 'never'. The 'explicit' option prevent the automatic status calls from showing progress."
 }
